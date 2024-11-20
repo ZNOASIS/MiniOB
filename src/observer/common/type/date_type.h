@@ -1,26 +1,35 @@
 #pragma once
 
 #include "common/type/data_type.h"
+#include <iomanip>
+#include "common/lang/comparator.h"
+#include "common/lang/sstream.h"
+#include "common/log/log.h"
+#include "common/type/date_type.h"
+#include "common/value.h"
 
-class DateType
+class DateType : public DataType
 {
 public:
-  Date() = default;
-  Date(const char *str);
-  Date(int data);
-  // Date(int year,int month,int day);
+  DateType() : DataType(AttrType::DATES) {}
+  virtual ~DateType() = default;
 
-  bool        is_valid() const { return valid; }
-  bool        operator<(const Date &that) const;
-  bool        operator==(const Date &that) const;
-  int         compare(const Date &that) const;
-  std::string to_string() const;
-  int         to_int() const;
-  void        parse_date_int(int date);
-  bool        is_date_valid() const;
-  bool        valid{};
-  int         year{};
-  int         month{};
-  int         day{};
-  std::string format(const std::string &format_str) const；
+  int compare(const Value &left, const Value &right) const override;
+  RC to_string(const Value &val, string &result) const override;
+  
 };
+
+int DateType::compare(const Value &left, const Value &right) const
+{
+  return common::compare_int((void *)&left.value_.int_value_, (void *)&right.value_.int_value_);
+}
+
+RC DateType::to_string(const Value &val, std::string &result) const
+{
+  stringstream ss;
+  ss << std::setw(4) << std::setfill('0') << val.value_.int_value_ / 10000
+     << std::setw(2) << std::setfill('0') << (val.value_.int_value_ % 10000) / 100
+     << std::setw(2) << std::setfill('0') << val.value_.int_value_ % 100;
+     result = ss.str();
+     return RC::SUCCESS;
+}
