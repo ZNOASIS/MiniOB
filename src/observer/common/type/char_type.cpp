@@ -48,7 +48,7 @@ RC CharType::cast_to(const Value &val, AttrType type, Value &result) const
           LOG_WARN("invalid date format: %s", val.value_.pointer_value_);
           return RC::INVALID_ARGUMENT;
         }
-        result.set_date(y, m, d);
+        result.set_date(y*10000+m*100+d);
     }break;
     default: return RC::UNIMPLEMENTED;
   }
